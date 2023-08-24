@@ -1,6 +1,4 @@
-import 'package:e_serve/services/auth/auth_user.dart';
-import 'package:flutter/cupertino.dart';
-
+import 'package:e_serve/services/to_do/auth_user.dart';
 // we want our auth provider to provide us with the current user
 // can extend for more auth provider
 

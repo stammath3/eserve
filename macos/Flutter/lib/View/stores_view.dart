@@ -74,14 +74,14 @@ class _StoresViewState extends State<StoresView> {
         future: getAllStores(), // Fetch the list of stores
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return const Center(child: Text('Error fetching stores'));
+            return Center(child: Text('Error fetching stores'));
           } else if (snapshot.hasData) {
             List<StoresMap> stores = snapshot.data!;
             return StoresListView(stores: stores);
           } else {
-            return const Center(child: Text('No stores found'));
+            return Center(child: Text('No stores found'));
           }
         },
       ),

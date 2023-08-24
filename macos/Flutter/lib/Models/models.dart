@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/src/widgets/framework.dart';
 
 //Users
 class UserMap {
@@ -186,16 +189,16 @@ class ClientsMap {
       : id = doc.id,
         email = doc.data()!["email"],
         name = doc.data()!["name"],
-        stores = doc.data()!["stores"] ?? [],
+        stores = doc.data()!["stores"],
         username = doc.data()!["username"];
 }
 
-//Orders
+//Clients
 
 class OrdersMap {
   late String client;
-  late bool concluded;
-  late Map order;
+  late Bool concluded;
+  late List<dynamic> order;
   late String order_id;
   late String store;
 
