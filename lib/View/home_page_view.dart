@@ -29,14 +29,13 @@ class HomePage extends StatelessWidget {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             final user = FirebaseAuth.instance.currentUser;
-            log('ELAAAAAAAAAAA');
             if (user != null) {
               if (user.emailVerified) {
-                log('Emeil verified');
-                getAllClients();
-                getAllOrders();
+                //log('Emeil verified');
+                //getAllClients();
+                //getAllOrders();
                 getAllUsers();
-                getAllStores();
+                //getAllStores();
                 return const StoresView();
               } else {
                 log("not verified");

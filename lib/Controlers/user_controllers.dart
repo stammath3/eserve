@@ -1,20 +1,21 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../Models/models.dart';
+import '../Models/user_model.dart';
 
 //Users
 
 final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-Future<UserMap> createUser(User dbuser) async {
+Future<UserMap> createUser(User dbuser, String? name) async {
   final usermap = UserMap(
-      //displayName: dbuser.displayName,
-      email: dbuser.email,
-      emailVerified: dbuser.emailVerified,
-      isAnonymous: dbuser.isAnonymous,
-      creationTime: dbuser.metadata.creationTime.toString(),
-      uid: dbuser.uid);
+    displayName: name ?? "",
+    email: dbuser.email,
+    emailVerified: dbuser.emailVerified,
+    isAnonymous: dbuser.isAnonymous,
+    creationTime: dbuser.metadata.creationTime.toString(),
+    id: dbuser.uid,
+  );
 
   var userRef = addUser(usermap);
 
@@ -26,10 +27,6 @@ Future<DocumentReference<Object?>> addUser(UserMap userData) async {
   var documentReference = await _db.collection("users").add(userData.toMap());
   return documentReference;
 }
-
-//   updateEmployee(User userData) async {
-//   await _db.collection("users").doc("edw_thelei to doc id tou user").update(userData.toMap());
-// }
 
 Future<void> deleteUser(String documentId) async {
   await _db.collection("users").doc(documentId).delete();
@@ -60,12 +57,67 @@ Future<List<UserMap>> getAllUsers() async {
         .map((doc) => UserMap.fromDocumentSnapshot(
             doc as DocumentSnapshot<Map<String, dynamic>>))
         .toList();
-
-    log('usersssssssssssssssss');
+    log("Usersssssssssss");
     log(users.toString());
     return users;
   } catch (e) {
-    print('Error fetching users: $e');
+    log('Error fetching users: $e');
     return [];
+  }
+}
+
+Future<UserMap?> getUserByDocID(String userID) async {
+  try {
+    DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+        await FirebaseFirestore.instance.collection('users').doc(userID).get();
+
+    if (userSnapshot.exists) {
+      return UserMap.fromDocumentSnapshot(userSnapshot);
+    } else {
+      print('User with ID $userID not found.');
+      return null; // Return null if user doesn't exist
+    }
+  } catch (e) {
+    print('Error fetching user: $e');
+    return null; // Return null in case of an error
+  }
+}
+
+Future<UserMap?> getUserByID(String userID) async {
+  try {
+    QuerySnapshot<Map<String, dynamic>> userSnapshot =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .where('id', isEqualTo: userID)
+            .limit(1) // Limit to one document (optional)
+            .get();
+
+    if (userSnapshot.docs.isNotEmpty) {
+      // Get the first document from the query results
+      return UserMap.fromDocumentSnapshot(userSnapshot.docs[0]);
+    } else {
+      print('User with UID $userID not found.');
+      return null; // Return null if user doesn't exist
+    }
+  } catch (e) {
+    print('Error fetching user: $e');
+    return null; // Return null in case of an error
+  }
+}
+
+Future<void> updateUserProfile(
+    String uid, String email, String displayName) async {
+  try {
+    await FirebaseAuth.instance.currentUser?.updateDisplayName(displayName);
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'email': email,
+      'displayName': displayName,
+    });
+
+    print('User profile updated successfully');
+  } catch (e) {
+    print('Error updating user profile: $e');
+    // Handle error appropriately
   }
 }

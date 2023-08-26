@@ -1,12 +1,23 @@
+import 'dart:developer';
+
 import 'package:e_serve/Controlers/stores_controllers.dart';
-import 'package:e_serve/Models/models.dart';
+import 'package:e_serve/Controlers/user_controllers.dart';
 import 'package:e_serve/View/store_details_screen.dart';
+import 'package:e_serve/View/user_profile_view.dart';
+import 'package:e_serve/View/users_orders_view.dart';
+import 'package:e_serve/View/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../Models/routes.dart';
+import '../Models/store_model.dart';
+import '../Models/user_model.dart';
 
-enum MenuAction { logout }
+enum MenuAction {
+  profile,
+  orders,
+  logout,
+}
 
 class StoresView extends StatefulWidget {
   const StoresView({super.key});
@@ -39,6 +50,29 @@ class _StoresViewState extends State<StoresView> {
   //   super.dispose();
   // }
 
+  late String firebaseUserID;
+  late UserMap currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize firebaseUserID
+    firebaseUserID = FirebaseAuth.instance.currentUser!.uid;
+
+    // Fetch user data using getUserByID
+    getUserData();
+  }
+
+  Future<void> getUserData() async {
+    final x = await getUserByID(firebaseUserID);
+    setState(() {
+      currentUser = x!;
+      //log("edwwwwwwwwwwwwwwwww");
+      //log(currentUser!.id.toString());
+      //log(currentUser.toString());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,12 +93,40 @@ class _StoresViewState extends State<StoresView> {
                   }
                   //log(shouldLogout.toString());
                   break;
+                case MenuAction.profile:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserProfilePage(
+                          currentUser!), // Pass the user details
+                    ),
+                  );
+                  break;
+                case MenuAction.orders:
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          UsersOrders(currentUser!), // Pass the user details
+                    ),
+                  );
+                  break;
               }
             },
             itemBuilder: (context) {
-              return const [
+              return [
                 PopupMenuItem<MenuAction>(
-                    value: MenuAction.logout, child: Text('Logout')),
+                  value: MenuAction.profile, // Define this value in your enum
+                  child: Text('Profile'),
+                ),
+                PopupMenuItem<MenuAction>(
+                  value: MenuAction.orders, // Define this value in your enum
+                  child: Text('Orders'),
+                ),
+                PopupMenuItem<MenuAction>(
+                  value: MenuAction.logout, // Define this value in your enum
+                  child: Text('Logout'),
+                ),
               ];
             },
           )
@@ -79,7 +141,10 @@ class _StoresViewState extends State<StoresView> {
             return const Center(child: Text('Error fetching stores'));
           } else if (snapshot.hasData) {
             List<StoresMap> stores = snapshot.data!;
-            return StoresListView(stores: stores);
+            return StoresListView(
+              stores: stores,
+              user: currentUser,
+            );
           } else {
             return const Center(child: Text('No stores found'));
           }
@@ -91,8 +156,9 @@ class _StoresViewState extends State<StoresView> {
 
 class StoresListView extends StatelessWidget {
   final List<StoresMap> stores;
+  final UserMap user;
 
-  StoresListView({required this.stores});
+  StoresListView({required this.stores, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -108,8 +174,10 @@ class StoresListView extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    StoreDetailScreen(store), // Pass store details
+                builder: (context) => StoreDetailScreen(
+                  store,
+                  user: user,
+                ), // Pass store details
               ),
             );
           },
@@ -151,30 +219,30 @@ class StoresListView extends StatelessWidget {
   // }
 }
 
-Future<bool> showLogOutDialog(BuildContext context) {
-  return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Sign Out'),
-          content: const Text('Are you sure you want to sign out ?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: const Text('Logout'),
-            ),
-          ],
-        );
-      }).then((value) => value ?? false);
-}
+// Future<bool> showLogOutDialog(BuildContext context) {
+//   return showDialog<bool>(
+//       context: context,
+//       builder: (context) {
+//         return AlertDialog(
+//           title: const Text('Sign Out'),
+//           content: const Text('Are you sure you want to sign out ?'),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop(false);
+//               },
+//               child: const Text('Cancel'),
+//             ),
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop(true);
+//               },
+//               child: const Text('Logout'),
+//             ),
+//           ],
+//         );
+//       }).then((value) => value ?? false);
+// }
 
 // Future<QuerySnapshot<Map<String, dynamic>>> _loadStoresAsList() async {
 //   var stores = await retrieveStoresAsMap();

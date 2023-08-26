@@ -1,36 +1,57 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:e_serve/Models/user_model.dart';
+import 'package:e_serve/View/basket_view.dart';
 import 'package:flutter/material.dart';
 
-import '../Models/models.dart';
+import '../Models/order_model.dart';
+import '../Models/store_model.dart';
 
-class StoreDetailScreen extends StatelessWidget {
-  final StoresMap store; // Replace 'StoresMap' with your actual class name
-
-  const StoreDetailScreen(this.store, {super.key});
+class StoreDetailScreen extends StatefulWidget {
+  final StoresMap store;
+  final UserMap user;
+  const StoreDetailScreen(this.store, {Key? key, required this.user})
+      : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // final json = jsonDecode(store.toMap().toString());
-    // Map<String, dynamic> data = jsonDecode(json);
-    // log(data.toString());
+  _StoreDetailScreenState createState() => _StoreDetailScreenState(store, user);
+}
 
-    List<MenuItem> menuItems = (store.menu as List)
+class _StoreDetailScreenState extends State<StoreDetailScreen> {
+  Basket basket = Basket();
+  List<MenuItems> menuItems = [];
+  final StoresMap store;
+  final UserMap user;
+  _StoreDetailScreenState(this.store, this.user);
+
+  @override
+  void initState() {
+    super.initState();
+    menuItems = (widget.store.menu as List)
         .expand((category) => (category['menuItems'] as List).map((item) {
-              return MenuItem(
+              return MenuItems(
                 cost: item['cost'],
                 name: item['name'],
                 id: item['id'],
               );
             }))
         .toList();
+  }
 
-    log(menuItems.toString());
-
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: Text(store.name ?? 'Store Detail')),
+        appBar: AppBar(
+          title: Text(widget.store.name ?? 'Store Detail'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -44,39 +65,62 @@ class StoreDetailScreen extends StatelessWidget {
                     return ListTile(
                       title: Text(menuItems[index].name),
                       subtitle: Text('Cost: ${menuItems[index].cost}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                basket.addItem(menuItems[index]);
+                              });
+                            },
+                            icon: Icon(Icons.add),
+                            label: Text(''),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                basket.removeItem(menuItems[index]);
+                              });
+                            },
+                            icon: Icon(Icons.remove),
+                            label: Text(''),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),
               ),
+              Text('Total Cost: ${basket.getTotalCost()}'),
             ],
           ),
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BasketPage(
+                  user: user,
+                  basket: basket,
+                  store: store,
+                ),
+              ),
+            );
+          },
+          label: Text('Basket (${basket.getItems().length})'),
+          icon: Icon(Icons.shopping_basket),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
-
-    // return Scaffold(
-    //   appBar: AppBar(title: Text(store.name ?? 'Store Detail')),
-    //   body: Center(
-    //     child: Column(
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       crossAxisAlignment: CrossAxisAlignment.center,
-    //       children: [
-    //         Text('Store Name: ${store.name ?? 'No Name'}'),
-    //         Text('Store Owner: ${store.owner ?? 'No Owner'}'),
-    //         Text('Store ID: ${store.id ?? 'No ID'}'),
-    //         Text('Menu: ${store.menu[1]['menuItems'] ?? 'No Menu'}'),
-    //         // Display other store details here
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
-}
-
-class MenuItem {
-  final String cost;
-  final String name;
-  final int id;
-
-  MenuItem({required this.cost, required this.name, required this.id});
 }
