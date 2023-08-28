@@ -4,26 +4,34 @@ import 'dart:developer';
 import 'package:e_serve/Models/user_model.dart';
 import 'package:e_serve/View/basket_view.dart';
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Models/order_model.dart';
 import '../Models/store_model.dart';
 
 class StoreDetailScreen extends StatefulWidget {
   final StoresMap store;
   final UserMap user;
-  const StoreDetailScreen(this.store, {Key? key, required this.user})
+  final TableData reservedTable;
+  const StoreDetailScreen(
+      {Key? key,
+      required this.store,
+      required this.user,
+      required this.reservedTable})
       : super(key: key);
 
   @override
-  _StoreDetailScreenState createState() => _StoreDetailScreenState(store, user);
+  _StoreDetailScreenState createState() =>
+      _StoreDetailScreenState(store, user, reservedTable);
 }
 
 class _StoreDetailScreenState extends State<StoreDetailScreen> {
   Basket basket = Basket();
   List<MenuItems> menuItems = [];
+  //List<TableData> tables = []; // New list to store tables
   final StoresMap store;
   final UserMap user;
-  _StoreDetailScreenState(this.store, this.user);
+  final TableData reservedTable;
+  _StoreDetailScreenState(this.store, this.user, this.reservedTable);
 
   @override
   void initState() {
@@ -57,6 +65,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              SizedBox(height: 20),
               const Text('Menu'),
               Expanded(
                 child: ListView.builder(
@@ -109,6 +118,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => BasketPage(
+                  table: reservedTable,
                   user: user,
                   basket: basket,
                   store: store,

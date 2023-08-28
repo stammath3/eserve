@@ -27,6 +27,7 @@ Future<List<OrdersMap>> getAllOrders() async {
 Future<void> createOrder(OrdersMap order) async {
   final ordersCollection = FirebaseFirestore.instance.collection('orders');
   await ordersCollection.add(order.toMap());
+
   log('orderrrrrrrrrrrrrrrrrr');
   log(order.toString());
 }
@@ -51,3 +52,71 @@ Future<int> getNextAvailableOrderID() async {
   return nextOrderID;
 }
 //}
+
+Future<OrdersMap?> getOrderById(int orderId) async {
+  try {
+    QuerySnapshot<Map<String, dynamic>> orderSnapshot = await FirebaseFirestore
+        .instance
+        .collection('orders')
+        .where('order_id', isEqualTo: orderId)
+        .limit(1)
+        .get();
+
+    if (orderSnapshot.docs.isNotEmpty) {
+      log(orderSnapshot.toString());
+      return OrdersMap.fromDocumentSnapshot(orderSnapshot.docs.first);
+    } else {
+      return null; // Order with the given ID doesn't exist
+    }
+  } catch (e) {
+    print("Error getting order by ID: $e");
+    return null;
+  }
+}
+
+Future<void> updateOrderConcludedStatus(int orderID, bool concluded) async {
+  try {
+    final orderQuerySnapshot = await FirebaseFirestore.instance
+        .collection('orders')
+        .where('order_id', isEqualTo: orderID)
+        .limit(1) // Limit to one result
+        .get();
+
+    if (orderQuerySnapshot.docs.isNotEmpty) {
+      final orderId = orderQuerySnapshot.docs.first.id;
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(orderId)
+          .update({
+        'concluded': concluded,
+      });
+    } else {
+      print('Order not found');
+    }
+  } catch (error) {
+    // Handle error as needed
+    print('Error updating order concluded status: $error');
+  }
+}
+
+Future<String?> getTableNameByTableId(String storeId, int tableId) async {
+  try {
+    final storeDoc = await FirebaseFirestore.instance
+        .collection('stores')
+        .doc(storeId)
+        .get();
+    final tables = storeDoc['tables'] as List<dynamic>;
+
+    final tableInfo = tables.firstWhere((table) => table['table_id'] == tableId,
+        orElse: () => null);
+
+    if (tableInfo != null) {
+      return tableInfo['name'] as String;
+    } else {
+      return null; // Table with the specified ID not found
+    }
+  } catch (error) {
+    print('Error getting table name by table ID: $error');
+    return null;
+  }
+}

@@ -8,6 +8,7 @@ class OrdersMap {
   late dynamic order;
   late int order_id;
   late String store;
+  late int table_id;
 
   OrdersMap({
     required this.user,
@@ -15,6 +16,7 @@ class OrdersMap {
     required this.order,
     required this.order_id,
     required this.store,
+    required this.table_id,
   });
 
   Map<String, dynamic> toMap() {
@@ -24,13 +26,14 @@ class OrdersMap {
       'order': order,
       'order_id': order_id,
       'store': store,
+      'table_id': table_id,
     };
   }
 
   @override
   String toString() {
     return 'OrdersMap{user: $user, concluded: $concluded, order: $order, '
-        'order_id: $order_id, store: $store}';
+        'order_id: $order_id, store: $store, table_id: $table_id}';
   }
 
   Map<String, dynamic> toJson() {
@@ -40,6 +43,7 @@ class OrdersMap {
       'order': order,
       'order_id': order_id,
       'store': store,
+      'table_id': table_id,
     };
   }
 
@@ -48,14 +52,16 @@ class OrdersMap {
         concluded = ordersMap["concluded"],
         order = ordersMap["order"],
         order_id = ordersMap["order_id"],
-        store = ordersMap["store"];
+        store = ordersMap["store"],
+        table_id = ordersMap["table_id"];
 
   OrdersMap.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)
       : order_id = doc.data()!["order_id"],
         user = doc.data()!["user"],
         concluded = doc.data()!["concluded"],
         order = doc.data()!["order"],
-        store = doc.data()!["store"];
+        store = doc.data()!["store"],
+        table_id = doc.data()!["table_id"];
 }
 
 //MenuItem
@@ -90,4 +96,20 @@ class Basket {
     }
     return totalCost;
   }
+}
+
+class TableData {
+  late int tableId;
+  late int orderId;
+  late bool isReserved;
+  late String name;
+  late String userId;
+
+  TableData({
+    required this.tableId,
+    required this.orderId,
+    required this.isReserved,
+    required this.name,
+    required this.userId,
+  });
 }

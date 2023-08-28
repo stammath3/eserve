@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:e_serve/Controlers/stores_controllers.dart';
 import 'package:e_serve/Controlers/user_controllers.dart';
-import 'package:e_serve/View/store_details_screen.dart';
+import 'package:e_serve/View/tables_view.dart';
 import 'package:e_serve/View/user_profile_view.dart';
 import 'package:e_serve/View/users_orders_view.dart';
 import 'package:e_serve/View/widgets.dart';
@@ -174,10 +174,14 @@ class StoresListView extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => StoreDetailScreen(
-                  store,
+                builder: (context) => TablesViewScreen(
+                  store: store,
                   user: user,
                 ), // Pass store details
+                // builder: (context) => StoreDetailScreen(
+                //   store,
+                //   user: user,
+                // ), // Pass store details
               ),
             );
           },

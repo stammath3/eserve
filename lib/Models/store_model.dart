@@ -39,6 +39,7 @@ class StoresMap {
         'owner: $owner, tables: $tables, id: $id, imageData: $imageData}';
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'menu': menu,

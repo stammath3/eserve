@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -79,7 +80,10 @@ Future<List<StoresMap>> getAllStores() async {
         .toList();
 
     // log('storesssssssssssssssss');
-    //log(stores.toString());
+    // log(stores.toString());
+    // String dd = jsonEncode(stores);
+    // log(dd);
+
     return stores;
   } catch (e) {
     //log('Error fetching stores: $e');
@@ -96,5 +100,16 @@ Future<String> getStoreOwnerName(
   } catch (e) {
     print('Error fetching owner name: $e');
     return 'Unknown Owner';
+  }
+}
+
+Future<StoresMap?> getStoreDetails(String storeId) async {
+  DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance.collection('stores').doc(storeId).get();
+
+  if (snapshot.exists) {
+    return StoresMap.fromDocumentSnapshot(snapshot);
+  } else {
+    return null;
   }
 }

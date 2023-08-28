@@ -34,7 +34,7 @@ class HomePage extends StatelessWidget {
                 //log('Emeil verified');
                 //getAllClients();
                 //getAllOrders();
-                getAllUsers();
+                //getAllUsers();
                 //getAllStores();
                 return const StoresView();
               } else {
