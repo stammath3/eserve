@@ -10,17 +10,21 @@ class PaymentPage extends StatefulWidget {
   final double cost;
   final StoresMap store;
   final String tableName;
+  final double totalCost;
+  final List<MenuItems> basketItems;
   PaymentPage({
     Key? key,
     required this.order,
     required this.cost,
     required this.store,
     required this.tableName,
+    required this.totalCost,
+    required this.basketItems,
   }) : super(key: key);
 
   @override
   State<PaymentPage> createState() =>
-      _PaymentPageState(order, cost, store, tableName);
+      _PaymentPageState(order, cost, store, tableName, totalCost, basketItems);
 }
 
 class _PaymentPageState extends State<PaymentPage> {
@@ -28,23 +32,69 @@ class _PaymentPageState extends State<PaymentPage> {
   late final OrdersMap? order;
   final StoresMap store;
   final String tableName;
+  final double totalCost;
+  final List<MenuItems> basketItems;
 
-  _PaymentPageState(this.order, this.cost, this.store, this.tableName);
+  _PaymentPageState(this.order, this.cost, this.store, this.tableName,
+      this.totalCost, this.basketItems);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Payment Page')),
+      appBar: AppBar(
+        title: Text('Payment Page'),
+        backgroundColor: Color.fromARGB(255, 215, 35, 35),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Order Details'),
-            SizedBox(height: 16),
-            Text('Order ID: ${order!.order_id}'),
-            Text('Store: ${order!.store}'),
-            Text('Concluded: ${order!.concluded.toString()}'),
-            // Add more order details as needed
+            Text(
+              'Order Details',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+
+            Expanded(
+                child: Container(
+              child: ListView.builder(
+                itemCount: basketItems.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(basketItems[index].name),
+                    subtitle: Text('Cost: ${basketItems[index].cost}'),
+                  );
+                },
+              ),
+            )),
+
+            SizedBox(height: 0),
+            //Text('Order ID: ${order!.order_id}'),
+            //Text('Store: ${order!.store}'),
+            Card(
+              margin: EdgeInsets.symmetric(vertical: 0, horizontal: 46),
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(16), // Set the border radius
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16), // Adjust
+                child: Text(
+                  'Cost : ${totalCost} 	€ \nStore : ${store.name} \nConcluded: ${order!.concluded.toString()} ',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+            // Text('Store : ${store.name}'),
+
+            // Text('Concluded: ${order!.concluded.toString()}'),
+
             SizedBox(height: 24),
             ElevatedButton(
               onPressed: () async {
@@ -86,6 +136,9 @@ class _PaymentPageState extends State<PaymentPage> {
                   (_) => false,
                 );
               },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+              ),
               child: Text('Pay Order'),
             ),
           ],

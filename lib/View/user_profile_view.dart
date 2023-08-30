@@ -48,23 +48,37 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
+        backgroundColor: Color.fromARGB(255, 215, 35, 35),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TextFormField(
-              controller: _email,
-              decoration: InputDecoration(labelText: 'Email'),
+            Card(
+              elevation: 3, // Add a slight elevation to the card
+              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: TextFormField(
+                controller: _email,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
             ),
-            TextFormField(
-              controller: _displayName,
-              decoration: InputDecoration(labelText: 'Name'),
+            Card(
+              elevation: 3, // Add a slight elevation to the card
+              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: TextFormField(
+                controller: _displayName,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: _updateProfile,
               child: Text('Update Profile'),
+              style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.black)),
             ),
           ],
         ),

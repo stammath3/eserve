@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_serve/Models/user_model.dart';
-import 'package:e_serve/View/basket_view.dart';
+import 'package:e_serve/View/order_review_basket.dart';
 import 'package:e_serve/View/store_details_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +68,7 @@ class _TableViewScreenState extends State<TablesViewScreen> {
       home: Scaffold(
         appBar: AppBar(
           title: Text(widget.store.name ?? 'Store Detail'),
+          backgroundColor: Color.fromARGB(255, 215, 35, 35),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
@@ -80,7 +81,14 @@ class _TableViewScreenState extends State<TablesViewScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('Tables'), // Header for tables
+              const Text(
+                'Tables',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, // Make the text bold
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
+              ), // Header for tables
               Expanded(
                   child: ListView.builder(
                 itemCount: tables.length,
@@ -88,94 +96,117 @@ class _TableViewScreenState extends State<TablesViewScreen> {
                   final table = tables[index];
                   final isReserved = table.isReserved;
 
-                  final buttonColor = isReserved ? Colors.red : Colors.green;
-                  return ListTile(
-                    title: Text('Table Name: ${table.name}'),
-                    subtitle: Text('ID of Reservation: ${table.tableId}'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Reserved: ${isReserved.toString()}'),
-                        SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: isReserved || table.userId.isNotEmpty
-                              ? null // Disable the button if the table is reserved
-                              : () async {
-                                  final userID = user.id;
+                  final buttonColor = isReserved ? Colors.grey : Colors.green;
+                  final lineColour = isReserved ? Colors.grey : Colors.green;
 
-                                  final hasReservedTable = tables.any((t) =>
-                                      t.userId.toString() == userID &&
-                                      t.tableId != table.tableId);
-                                  log('hasReservedTableeeeeeeeeeeee');
-                                  log(hasReservedTable.toString());
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: lineColour,
+                          blurRadius: 4,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.table_restaurant, // Use the table icon
+                        size: 48,
+                        color: lineColour, // Customize the icon color
+                      ),
+                      title: Text('${table.name}'),
+                      //subtitle: Text('ID of Reservation: ${table.tableId}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          //Text('Reserved: ${isReserved.toString()}'),
 
-                                  if (!isReserved &&
-                                      table.userId.isEmpty &&
-                                      !hasReservedTable) {
-                                    // Check if the user has already reserved a table
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: isReserved || table.userId.isNotEmpty
+                                ? null // Disable the button if the table is reserved
+                                : () async {
+                                    final userID = user.id;
 
-                                    if (!isReserved) {
-                                      await FirebaseFirestore.instance
-                                          .collection('stores')
-                                          .doc(widget.store.id)
-                                          .update({
-                                        'tables': FieldValue.arrayRemove([
-                                          {
-                                            'table_id': table.tableId,
-                                            'order_id': -1,
-                                            'is_reserved': isReserved,
-                                            'name': table.name,
-                                            'user_id': table.userId,
-                                          }
-                                        ])
-                                      });
+                                    final hasReservedTable = tables.any((t) =>
+                                        t.userId.toString() == userID &&
+                                        t.tableId != table.tableId);
+                                    log('hasReservedTableeeeeeeeeeeee');
+                                    log(hasReservedTable.toString());
 
-                                      await FirebaseFirestore.instance
-                                          .collection('stores')
-                                          .doc(widget.store.id)
-                                          .update({
-                                        'tables': FieldValue.arrayUnion([
-                                          {
-                                            'table_id': table.tableId,
-                                            'order_id': -1,
-                                            'is_reserved': true,
-                                            'name': table.name,
-                                            'user_id': userID,
-                                          }
-                                        ])
-                                      });
+                                    if (!isReserved &&
+                                        table.userId.isEmpty &&
+                                        !hasReservedTable) {
+                                      // Check if the user has already reserved a table
 
-                                      setState(() {
-                                        table.isReserved = true;
-                                        table.userId = userID;
-                                      });
+                                      if (!isReserved) {
+                                        await FirebaseFirestore.instance
+                                            .collection('stores')
+                                            .doc(widget.store.id)
+                                            .update({
+                                          'tables': FieldValue.arrayRemove([
+                                            {
+                                              'table_id': table.tableId,
+                                              'order_id': -1,
+                                              'is_reserved': isReserved,
+                                              'name': table.name,
+                                              'user_id': table.userId,
+                                            }
+                                          ])
+                                        });
+
+                                        await FirebaseFirestore.instance
+                                            .collection('stores')
+                                            .doc(widget.store.id)
+                                            .update({
+                                          'tables': FieldValue.arrayUnion([
+                                            {
+                                              'table_id': table.tableId,
+                                              'order_id': -1,
+                                              'is_reserved': true,
+                                              'name': table.name,
+                                              'user_id': userID,
+                                            }
+                                          ])
+                                        });
+
+                                        setState(() {
+                                          table.isReserved = true;
+                                          table.userId = userID;
+                                        });
+                                      } else {
+                                        // Notify the user that they have already reserved a table
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  'You have already reserved a table')),
+                                        );
+                                      }
                                     } else {
                                       // Notify the user that they have already reserved a table
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        SnackBar(
+                                        const SnackBar(
                                             content: Text(
                                                 'You have already reserved a table')),
                                       );
                                     }
-                                  } else {
-                                    // Notify the user that they have already reserved a table
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'You have already reserved a table')),
-                                    );
-                                  }
-                                },
-                          child: Text('Reserve'),
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: buttonColor, // Text color
-                            // Disable the button's click animation
-                            animationDuration: Duration.zero,
+                                  },
+                            child: Text('Reserve'),
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: buttonColor, // Text color
+                              // Disable the button's click animation
+                              animationDuration: Duration.zero,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -183,6 +214,10 @@ class _TableViewScreenState extends State<TablesViewScreen> {
 
               SizedBox(height: 20),
               ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.black),
+                ),
                 onPressed: () {
                   final hasReservedTable =
                       tables.any((t) => t.userId == user.id);
@@ -193,6 +228,7 @@ class _TableViewScreenState extends State<TablesViewScreen> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
+                          backgroundColor: Colors.white,
                           title: Text('Reservation Required'),
                           content: Text(
                               'You need to reserve a table to make an order.'),
@@ -202,6 +238,10 @@ class _TableViewScreenState extends State<TablesViewScreen> {
                                 Navigator.of(context).pop(); // Close the dialog
                               },
                               child: Text('OK'),
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.black)),
                             ),
                           ],
                         );
@@ -218,3 +258,21 @@ class _TableViewScreenState extends State<TablesViewScreen> {
     );
   }
 }
+
+// class SkewClipper extends CustomClipper<Path> {
+//   @override
+//   Path getClip(Size size) {
+//     final path = Path()
+//       ..moveTo(size.width * 0.1, 0) // Adjust the skew starting point
+//       ..lineTo(size.width, 0)
+//       ..lineTo(size.width * 0.9, size.height)
+//       ..lineTo(0, size.height)
+//       ..close();
+//     return path;
+//   }
+
+//   @override
+//   bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
+//     return true;
+//   }
+// }

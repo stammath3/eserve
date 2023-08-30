@@ -39,30 +39,87 @@ class _RegisterViewState extends State<RegisterView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
+        backgroundColor: Color.fromARGB(255, 215, 35, 35),
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _email,
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(hintText: 'Enter email'),
+          Card(
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // Set the border radius
+            ),
+            child: TextField(
+                controller: _email,
+                enableSuggestions: false,
+                autocorrect: false,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  hintText: '  Enter email',
+                  contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12), // Adju
+                  border:
+                      InputBorder.none, // Set border to none to remove the line
+                  focusedBorder: InputBorder.none, // Remove the line on focus
+                  enabledBorder:
+                      InputBorder.none, // Remove the line when not focused
+                  errorBorder:
+                      InputBorder.none, // Remove the line when there's an error
+                  disabledBorder:
+                      InputBorder.none, // Remove the line when disabled),
+                )),
           ),
-          TextField(
-            controller: _name,
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.name,
-            decoration: const InputDecoration(hintText: 'Enter name'),
-          ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(hintText: 'Enter password'),
-          ),
+          Card(
+              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(16), // Set the border radius
+              ),
+              child: TextField(
+                controller: _name,
+                enableSuggestions: false,
+                autocorrect: false,
+                keyboardType: TextInputType.name,
+                decoration: const InputDecoration(
+                  hintText: '  Enter name',
+                  contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12), // Adju
+                  border:
+                      InputBorder.none, // Set border to none to remove the line
+                  focusedBorder: InputBorder.none, // Remove the line on focus
+                  enabledBorder:
+                      InputBorder.none, // Remove the line when not focused
+                  errorBorder:
+                      InputBorder.none, // Remove the line when there's an error
+                  disabledBorder:
+                      InputBorder.none, // Remove the line when disabled),
+                ),
+              )),
+          Card(
+              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(16), // Set the border radius
+              ),
+              child: TextField(
+                controller: _password,
+                obscureText: true,
+                enableSuggestions: false,
+                autocorrect: false,
+                decoration: const InputDecoration(
+                  hintText: '  Enter password',
+                  contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12), // Adju
+                  border:
+                      InputBorder.none, // Set border to none to remove the line
+                  focusedBorder: InputBorder.none, // Remove the line on focus
+                  enabledBorder:
+                      InputBorder.none, // Remove the line when not focused
+                  errorBorder:
+                      InputBorder.none, // Remove the line when there's an error
+                  disabledBorder:
+                      InputBorder.none, // Remove the line when disabled)),
+                ),
+              )),
           TextButton(
             onPressed: () async {
               final email = _email.text;
@@ -108,14 +165,20 @@ class _RegisterViewState extends State<RegisterView> {
                 );
               }
             },
-            child: const Text('Register'),
+            child: const Text(
+              'Register',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context)
                   .pushNamedAndRemoveUntil(loginRoute, (route) => false);
             },
-            child: const Text('Already registerd? Login here!'),
+            child: const Text(
+              'Already registerd? Login here!',
+              style: TextStyle(color: Colors.black),
+            ),
           )
         ],
       ),

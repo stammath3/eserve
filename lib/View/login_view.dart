@@ -34,24 +34,72 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Login'),
+        backgroundColor: Color.fromARGB(255, 215, 35, 35),
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _email,
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(hintText: 'Enter email'),
+          Image.asset(
+            'assets/logo5.png',
+            width: MediaQuery.of(context).size.width / 3,
+            height: MediaQuery.of(context).size.width / 3,
           ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(hintText: 'Enter password'),
+          Card(
+            //elevation: 3, // Add a slight elevation to the card
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // Set the border radius
+            ),
+            child: TextField(
+              controller: _email,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                hintText: '  Enter email',
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 12), // Adjust padding here
+
+                border:
+                    InputBorder.none, // Set border to none to remove the line
+                focusedBorder: InputBorder.none, // Remove the line on focus
+                enabledBorder:
+                    InputBorder.none, // Remove the line when not focused
+                errorBorder:
+                    InputBorder.none, // Remove the line when there's an error
+                disabledBorder:
+                    InputBorder.none, // Remove the line when disabled
+              ),
+            ),
+          ),
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // Set the border radius
+            ),
+            //elevation: 3, // Add a slight elevation to the card
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: TextField(
+              controller: _password,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: '  Enter password',
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 12), // Adjust padding here
+                border:
+                    InputBorder.none, // Set border to none to remove the line
+                focusedBorder: InputBorder.none, // Remove the line on focus
+                enabledBorder:
+                    InputBorder.none, // Remove the line when not focused
+                errorBorder:
+                    InputBorder.none, // Remove the line when there's an error
+                disabledBorder:
+                    InputBorder.none, // Remove the line when disabled
+              ),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -106,14 +154,18 @@ class _LoginViewState extends State<LoginView> {
                 );
               }
             },
-            child: const Text('Login'),
+            child: const Text(
+              'Login',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context)
                   .pushNamedAndRemoveUntil(registerRoute, (route) => false);
             },
-            child: const Text('Not registered yet? Register here!'),
+            child: const Text('Not registered yet? Register here!',
+                style: TextStyle(color: Colors.black)),
           )
         ],
       ),

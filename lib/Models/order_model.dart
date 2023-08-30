@@ -1,5 +1,7 @@
 //Orders
 
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrdersMap {
@@ -9,6 +11,7 @@ class OrdersMap {
   late int order_id;
   late String store;
   late int table_id;
+  late double cost;
 
   OrdersMap({
     required this.user,
@@ -17,6 +20,7 @@ class OrdersMap {
     required this.order_id,
     required this.store,
     required this.table_id,
+    required this.cost,
   });
 
   Map<String, dynamic> toMap() {
@@ -27,13 +31,14 @@ class OrdersMap {
       'order_id': order_id,
       'store': store,
       'table_id': table_id,
+      'cost': cost,
     };
   }
 
   @override
   String toString() {
     return 'OrdersMap{user: $user, concluded: $concluded, order: $order, '
-        'order_id: $order_id, store: $store, table_id: $table_id}';
+        'order_id: $order_id, store: $store, table_id: $table_id, cost: $cost}';
   }
 
   Map<String, dynamic> toJson() {
@@ -44,6 +49,7 @@ class OrdersMap {
       'order_id': order_id,
       'store': store,
       'table_id': table_id,
+      'cost': cost,
     };
   }
 
@@ -53,7 +59,8 @@ class OrdersMap {
         order = ordersMap["order"],
         order_id = ordersMap["order_id"],
         store = ordersMap["store"],
-        table_id = ordersMap["table_id"];
+        table_id = ordersMap["table_id"],
+        cost = ordersMap["cost"];
 
   OrdersMap.fromDocumentSnapshot(DocumentSnapshot<Map<String, dynamic>> doc)
       : order_id = doc.data()!["order_id"],
@@ -61,7 +68,8 @@ class OrdersMap {
         concluded = doc.data()!["concluded"],
         order = doc.data()!["order"],
         store = doc.data()!["store"],
-        table_id = doc.data()!["table_id"];
+        table_id = doc.data()!["table_id"],
+        cost = doc.data()!["cost"];
 }
 
 //MenuItem
@@ -69,6 +77,16 @@ class MenuItems {
   final String cost;
   final String name;
   final int id;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! MenuItems) return false;
+
+    return cost == other.cost && name == other.name && id == other.id;
+  }
+
+  @override
+  int get hashCode => hashValues(cost, name, id);
 
   MenuItems({required this.cost, required this.name, required this.id});
 }

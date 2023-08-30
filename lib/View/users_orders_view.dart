@@ -46,6 +46,7 @@ class _UsersOrdersState extends State<UsersOrders> {
     return Scaffold(
       appBar: AppBar(
         title: Text('User Orders'),
+        backgroundColor: Color.fromARGB(255, 215, 35, 35),
       ),
       body: StreamBuilder<List<OrdersMap>>(
         stream: _userOrdersStream,
@@ -55,38 +56,50 @@ class _UsersOrdersState extends State<UsersOrders> {
             return ListView.builder(
               itemCount: userOrders.length,
               itemBuilder: (context, index) {
-                return FutureBuilder<StoresMap?>(
-                  future: getStoreDetails(userOrders[index].store),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (!snapshot.hasData || snapshot.data == null) {
-                      return Text('Store not found');
-                    } else {
-                      StoresMap store = snapshot.data!;
-                      return ListTile(
-                        title: Text('Order ID: ${userOrders[index].order_id}'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Store: ${store.name}'),
-                            Text('Table ID: ${userOrders[index].table_id}'),
-                          ],
-                        ),
-                        trailing: Text(
-                            'Concluded: ${userOrders[index].concluded.toString()}'),
-                      );
-                    }
-                  },
+                return Card(
+                  elevation: 3, // Add a slight elevation to the card
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: FutureBuilder<StoresMap?>(
+                    future: getStoreDetails(userOrders[index].store),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data == null) {
+                        return Text('Store not found');
+                      } else {
+                        StoresMap store = snapshot.data!;
+                        return ListTile(
+                          title: Text('Store: ${store.name}'),
+                          //title: Text('Order ID: ${userOrders[index].order_id}'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //Text('Store: ${store.name}'),
+                              Text('Cost: ${userOrders[index].cost} 	€'),
+                              //Text('Table ID: ${userOrders[index].table_id}'),
+                            ],
+                          ),
+                          trailing: Text(
+                              'Concluded: ${userOrders[index].concluded.toString()}'),
+                        );
+                      }
+                    },
+                  ),
                 );
               },
             );
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(
+                    // strokeWidth: 3,
+
+                    ));
           }
         },
       ),

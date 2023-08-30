@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:e_serve/Controlers/stores_controllers.dart';
@@ -27,29 +28,6 @@ class StoresView extends StatefulWidget {
 }
 
 class _StoresViewState extends State<StoresView> {
-  // @override
-  // initState() {
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     var stores = _asyncMethod();
-  //   });
-
-  //   super.initState();
-  // }
-
-  // _asyncMethod() async {
-  //   //List<UserMap> users = await getAllUsers();
-  //   //log(users.toString());
-
-  //   List<UserMap> stores = await getAllStores();
-  //   log(stores.toString());
-  //   return stores;
-  // }
-
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  // }
-
   late String firebaseUserID;
   late UserMap currentUser;
 
@@ -67,9 +45,6 @@ class _StoresViewState extends State<StoresView> {
     final x = await getUserByID(firebaseUserID);
     setState(() {
       currentUser = x!;
-      //log("edwwwwwwwwwwwwwwwww");
-      //log(currentUser!.id.toString());
-      //log(currentUser.toString());
     });
   }
 
@@ -78,6 +53,7 @@ class _StoresViewState extends State<StoresView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Stores '),
+        backgroundColor: Color.fromARGB(255, 215, 35, 35),
         actions: [
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
@@ -166,29 +142,36 @@ class StoresListView extends StatelessWidget {
       itemCount: stores.length,
       itemBuilder: (context, index) {
         final store = stores[index];
-        return ListTile(
-          title: Text(store.name ?? 'No Name'),
-          subtitle: Text(store.owner),
-          trailing: Text(store.id ?? 'No ID'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TablesViewScreen(
-                  store: store,
-                  user: user,
-                ), // Pass store details
-                // builder: (context) => StoreDetailScreen(
-                //   store,
-                //   user: user,
-                // ), // Pass store details
-              ),
-            );
-          },
+        final logoBytes =
+            base64Decode(store.imageData); // Decode Base64 to bytes
+        return Card(
+          elevation: 3, // Add a slight elevation to the card
+          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: ListTile(
+            leading: Image.memory(logoBytes),
+            title: Text(store.name ?? 'No Name'),
+
+            //subtitle: Text(store.owner),
+            //trailing: Text(store.id ?? 'No ID'),
+            //trailing: Text('Order'),
+
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TablesViewScreen(
+                    store: store,
+                    user: user,
+                  ), // Pass store details
+                ),
+              );
+            },
+          ),
         );
       },
     );
   }
+}
 
 // with doc reference ownwer
 
@@ -221,7 +204,7 @@ class StoresListView extends StatelessWidget {
   //     },
   //   );
   // }
-}
+
 
 // Future<bool> showLogOutDialog(BuildContext context) {
 //   return showDialog<bool>(
@@ -253,3 +236,5 @@ class StoresListView extends StatelessWidget {
 //   //log(stores.toString());
 //   return stores;
 // }
+
+
