@@ -1,9 +1,5 @@
 import 'dart:developer';
 
-import 'package:e_serve/Controlers/client_controllers.dart';
-import 'package:e_serve/Controlers/orders_controllers.dart';
-import 'package:e_serve/Controlers/stores_controllers.dart';
-import 'package:e_serve/Controlers/user_controllers.dart';
 import 'package:e_serve/View/login_view.dart';
 import 'package:e_serve/View/stores_view.dart';
 import 'package:e_serve/View/verify_email_view.dart';
@@ -31,7 +27,6 @@ class HomePage extends StatelessWidget {
             final user = FirebaseAuth.instance.currentUser;
             if (user != null) {
               if (user.emailVerified) {
-                //log('Emeil verified');
                 //getAllClients();
                 //getAllOrders();
                 //getAllUsers();
@@ -39,30 +34,14 @@ class HomePage extends StatelessWidget {
                 return const StoresView();
               } else {
                 log("not verified");
-                log(user.emailVerified.toString());
-                //log(user.toString());
                 return const VerifyEmailView();
               }
             } else {
               log("not null");
               return const LoginView();
             }
-
-          // print(user);
-          // //if user exists take the value else take false
-          // if (user?.emailVerified ?? false) {
-          //   // verified
-          //   return Text('Done');
-          // } else {
-          //   //not verified
-          //   //Navigator.of(context).push(MaterialPageRoute(
-          //   //  builder: (context) => const VerifyEmailView(),
-          //   //));
-          //   return const VerifyEmailView();
-          // }
-          // return const Text('Done');
           default:
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
         }
       },
     );

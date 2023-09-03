@@ -1,10 +1,8 @@
-import 'dart:convert';
-import 'dart:developer';
+// ignore_for_file: no_logic_in_create_state, library_private_types_in_public_api
 
 import 'package:e_serve/Models/user_model.dart';
 import 'package:e_serve/View/order_review_basket.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Models/order_model.dart';
 import '../Models/store_model.dart';
 
@@ -27,7 +25,6 @@ class StoreDetailScreen extends StatefulWidget {
 class _StoreDetailScreenState extends State<StoreDetailScreen> {
   Basket basket = Basket();
   List<MenuItems> menuItems = [];
-  //List<TableData> tables = []; // New list to store tables
   final StoresMap store;
   final UserMap user;
   final TableData reservedTable;
@@ -36,7 +33,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
   @override
   void initState() {
     super.initState();
-    menuItems = (widget.store.menu as List)
+    menuItems = (widget.store.menu)
         .expand((category) => (category['menuItems'] as List).map((item) {
               return MenuItems(
                 cost: item['cost'],
@@ -52,10 +49,10 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 215, 35, 35),
-          title: Text(widget.store.name ?? 'Store Detail'),
+          backgroundColor: const Color.fromARGB(255, 215, 35, 35),
+          title: Text(widget.store.name),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -66,14 +63,12 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20),
-              Container(
-                child: const Text(
-                  'Menu',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+              const SizedBox(height: 20),
+              const Text(
+                'Menu',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
                 ),
               ),
               const Divider(
@@ -98,7 +93,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                               horizontal: 16, vertical: 8),
                           child: Text(
                             categoryName,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),
@@ -106,18 +101,18 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                         ),
                         ListView.builder(
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: menuItems.length,
                           itemBuilder: (context, index) {
                             final menuItem = menuItems[index];
 
                             return Container(
-                              margin: EdgeInsets.symmetric(
+                              margin: const EdgeInsets.symmetric(
                                   vertical: 8, horizontal: 16),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.grey,
                                     blurRadius: 4,
@@ -145,19 +140,19 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                           basket.addItem(menuItemsObject);
                                         });
                                       },
-                                      icon: Icon(Icons.add),
-                                      label: Text(''),
+                                      icon: const Icon(Icons.add),
+                                      label: const Text(''),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.green,
-                                        padding:
-                                            EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            10, 0, 0, 0),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(width: 8),
+                                    const SizedBox(width: 8),
                                     ElevatedButton.icon(
                                       onPressed: () {
                                         setState(() {
@@ -172,12 +167,12 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                                           basket.removeItem(menuItemsObject);
                                         });
                                       },
-                                      icon: Icon(Icons.remove),
-                                      label: Text(''),
+                                      icon: const Icon(Icons.remove),
+                                      label: const Text(''),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.red,
-                                        padding:
-                                            EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            10, 0, 0, 0),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -195,20 +190,12 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                   },
                 ),
               ),
-              //Text('Total Cost: ${basket.getTotalCost()}'),
             ],
           ),
         ),
         floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Text(
-            //   'Total Cost: ${basket.getTotalCost()}',
-            //   style: TextStyle(
-            //     fontWeight: FontWeight.bold,
-            //     fontSize: 18,
-            //   ),
-            // ),
             SizedBox(width: MediaQuery.of(context).size.width / 10),
             FloatingActionButton.extended(
               onPressed: () {
@@ -226,8 +213,8 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
               },
               label: Text(
                   'Order review (${basket.getItems().length}) ${basket.getTotalCost()} €'),
-              icon: Icon(Icons.shopping_basket),
-              backgroundColor: Color.fromARGB(255, 215, 35, 35),
+              icon: const Icon(Icons.shopping_basket),
+              backgroundColor: const Color.fromARGB(255, 215, 35, 35),
             ),
           ],
         ),

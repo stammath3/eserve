@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import '../Models/order_model.dart';
-
-final FirebaseFirestore _db = FirebaseFirestore.instance;
+import '../Models/routes.dart';
+import '../View/payment_page_view.dart';
 
 Future<List<OrdersMap>> getAllOrders() async {
   final CollectionReference ordersCollection =
@@ -23,7 +23,6 @@ Future<List<OrdersMap>> getAllOrders() async {
   }
 }
 
-//class FirestoreUtils {
 Future<void> createOrder(OrdersMap order) async {
   final ordersCollection = FirebaseFirestore.instance.collection('orders');
   await ordersCollection.add(order.toMap());
@@ -31,9 +30,7 @@ Future<void> createOrder(OrdersMap order) async {
   log('orderrrrrrrrrrrrrrrrrr');
   log(order.toString());
 }
-//}
 
-//class FirestoreUtils {
 Future<int> getNextAvailableOrderID() async {
   final ordersCollection = FirebaseFirestore.instance.collection('orders');
 
@@ -51,7 +48,6 @@ Future<int> getNextAvailableOrderID() async {
 
   return nextOrderID;
 }
-//}
 
 Future<OrdersMap?> getOrderById(int orderId) async {
   try {
@@ -69,7 +65,6 @@ Future<OrdersMap?> getOrderById(int orderId) async {
       return null; // Order with the given ID doesn't exist
     }
   } catch (e) {
-    print("Error getting order by ID: $e");
     return null;
   }
 }
@@ -90,12 +85,9 @@ Future<void> updateOrderConcludedStatus(int orderID, bool concluded) async {
           .update({
         'concluded': concluded,
       });
-    } else {
-      print('Order not found');
-    }
-  } catch (error) {
-    // Handle error as needed
-    print('Error updating order concluded status: $error');
+    } else {}
+  } catch (e) {
+    log('Error updating database: $e');
   }
 }
 
@@ -116,7 +108,141 @@ Future<String?> getTableNameByTableId(String storeId, int tableId) async {
       return null; // Table with the specified ID not found
     }
   } catch (error) {
-    print('Error getting table name by table ID: $error');
     return null;
   }
+}
+
+Future<dynamic> createNewOrder(
+    user, store, table, totalCost, context, basketItems, basket) async {
+  // Get the next available order ID
+  int nextOrderID = await getNextAvailableOrderID();
+  // Create an OrdersMap object with necessary data
+  OrdersMap order = OrdersMap(
+    user: user.id,
+    concluded: false,
+    order: basketItems
+        .map((item) => {
+              'cost': item.cost,
+              'name': item.name,
+              'id': item.id,
+            })
+        .toList(),
+    order_id: nextOrderID, // Get the next available order ID,
+    store: store.id,
+    table_id: table.tableId,
+    cost: totalCost,
+  );
+
+  // Create the order document in Firebase
+  await createOrder(order);
+  OrdersMap? newOrder = await getOrderById(nextOrderID);
+
+  if (newOrder == null) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Order failed'),
+          content: const Text('You need to order again.'),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  } else {
+    // Update the order_id field of the reserved table
+    if (table.tableId > 0 && user.id.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('stores')
+          .doc(store.id)
+          .update({
+        'tables': FieldValue.arrayRemove([
+          {
+            'table_id': table.tableId,
+            'order_id': -1,
+            'is_reserved': table.isReserved,
+            'name': table.name,
+            'user_id': user.id,
+          }
+        ])
+      });
+
+      await FirebaseFirestore.instance
+          .collection('stores')
+          .doc(store.id)
+          .update({
+        'tables': FieldValue.arrayUnion([
+          {
+            'table_id': table.tableId,
+            'order_id': nextOrderID, // Set the actual order ID
+            'is_reserved': true,
+            'name': table.name,
+            'user_id': user.id,
+          }
+        ])
+      });
+    }
+
+    // ignore: await_only_futures
+    List<MenuItems> listt = await basket.getItems();
+    // ignore: use_build_context_synchronously
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentPage(
+          order: newOrder,
+          cost: totalCost,
+          store: store,
+          tableName: table.name,
+          totalCost: totalCost,
+          basketItems: listt,
+        ),
+      ),
+    );
+  }
+  //clear basket
+  basketItems = [];
+}
+
+void pay(order, tableName, store, context) async {
+  // Update the reserved table information in Firestore
+  await FirebaseFirestore.instance
+      .collection('stores')
+      .doc(order!.store)
+      .update({
+    'tables': FieldValue.arrayRemove([
+      {
+        'table_id': order!.table_id,
+        'order_id': order!.order_id, // Set the actual order ID
+        'is_reserved': true,
+        'name': tableName,
+        'user_id': order!.user,
+      }
+    ])
+  });
+
+  await FirebaseFirestore.instance.collection('stores').doc(store.id).update({
+    'tables': FieldValue.arrayUnion([
+      {
+        'table_id': order!.table_id,
+        'order_id': -1,
+        'is_reserved': false,
+        'name': tableName,
+        'user_id': "",
+      }
+    ])
+  });
+
+  // Update the order's concluded status to true
+  await updateOrderConcludedStatus(order!.order_id, true);
+  Navigator.of(context).pushNamedAndRemoveUntil(
+    homePageRoute,
+    (_) => false,
+  );
 }

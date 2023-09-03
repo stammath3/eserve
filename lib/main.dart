@@ -20,7 +20,6 @@ void main() {
         storesRoute: (context) => const StoresView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),
         homePageRoute: (context) => const HomePage(),
-        //storeDetails: (context) => const StoreDetailScreen(),
       },
     ),
   );

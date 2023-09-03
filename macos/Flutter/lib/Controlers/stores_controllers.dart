@@ -1,8 +1,5 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:e_serve/Models/order_model.dart';
-import 'package:e_serve/View/store_details_screen.dart';
-import 'package:flutter/material.dart';
 import '../Models/store_model.dart';
 
 final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -81,51 +78,4 @@ Future<StoresMap?> getStoreDetails(String storeId) async {
   } else {
     return null;
   }
-}
-
-void navigateToStoreDetail(tables, user, store, context) {
-  final reservedTable = tables.firstWhere((table) => table.userId == user.id,
-      orElse: () => TableData(
-          tableId: -1,
-          orderId: -1,
-          isReserved: false,
-          name: '',
-          userId: '')); // Default if no reservation
-
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => StoreDetailScreen(
-        store: store,
-        user: user,
-        reservedTable: reservedTable,
-      ),
-    ),
-  );
-}
-
-Future<void> reserveTable(widget, table, isReserved, store, user) async {
-  await FirebaseFirestore.instance.collection('stores').doc(store.id).update({
-    'tables': FieldValue.arrayRemove([
-      {
-        'table_id': table.tableId,
-        'order_id': -1,
-        'is_reserved': isReserved,
-        'name': table.name,
-        'user_id': table.userId,
-      }
-    ])
-  });
-
-  await FirebaseFirestore.instance.collection('stores').doc(store.id).update({
-    'tables': FieldValue.arrayUnion([
-      {
-        'table_id': table.tableId,
-        'order_id': -1,
-        'is_reserved': true,
-        'name': table.name,
-        'user_id': user.id,
-      }
-    ])
-  });
 }

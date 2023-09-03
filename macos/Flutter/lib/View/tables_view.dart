@@ -1,11 +1,13 @@
 // ignore_for_file: library_private_types_in_public_api, no_logic_in_create_state
 
-import 'package:e_serve/Controlers/stores_controllers.dart';
-import 'package:e_serve/Models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 
 import '../Models/order_model.dart';
 import '../Models/store_model.dart';
+import '../Models/user_model.dart';
+import 'store_details_screen.dart';
 
 class TablesViewScreen extends StatefulWidget {
   final StoresMap store;
@@ -35,6 +37,27 @@ class _TableViewScreenState extends State<TablesViewScreen> {
         userId: tableData['user_id'],
       );
     }).toList();
+  }
+
+  void _navigateToStoreDetail() {
+    final reservedTable = tables.firstWhere((table) => table.userId == user.id,
+        orElse: () => TableData(
+            tableId: -1,
+            orderId: -1,
+            isReserved: false,
+            name: '',
+            userId: '')); // Default if no reservation
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StoreDetailScreen(
+          store: store,
+          user: user,
+          reservedTable: reservedTable,
+        ),
+      ),
+    );
   }
 
   @override
@@ -103,7 +126,6 @@ class _TableViewScreenState extends State<TablesViewScreen> {
                             onPressed: isReserved || table.userId.isNotEmpty
                                 ? null // Disable the button if the table is reserved
                                 : () async {
-                                    //reserveTable(user, tables, isReserved, table, widget, context)
                                     final userID = user.id;
 
                                     final hasReservedTable = tables.any((t) =>
@@ -115,8 +137,35 @@ class _TableViewScreenState extends State<TablesViewScreen> {
                                       // Check if the user has already reserved a table
 
                                       if (!isReserved) {
-                                        reserveTable(widget, table, isReserved,
-                                            store, user);
+                                        await FirebaseFirestore.instance
+                                            .collection('stores')
+                                            .doc(widget.store.id)
+                                            .update({
+                                          'tables': FieldValue.arrayRemove([
+                                            {
+                                              'table_id': table.tableId,
+                                              'order_id': -1,
+                                              'is_reserved': isReserved,
+                                              'name': table.name,
+                                              'user_id': table.userId,
+                                            }
+                                          ])
+                                        });
+
+                                        await FirebaseFirestore.instance
+                                            .collection('stores')
+                                            .doc(widget.store.id)
+                                            .update({
+                                          'tables': FieldValue.arrayUnion([
+                                            {
+                                              'table_id': table.tableId,
+                                              'order_id': -1,
+                                              'is_reserved': true,
+                                              'name': table.name,
+                                              'user_id': userID,
+                                            }
+                                          ])
+                                        });
 
                                         setState(() {
                                           table.isReserved = true;
@@ -166,7 +215,7 @@ class _TableViewScreenState extends State<TablesViewScreen> {
                   final hasReservedTable =
                       tables.any((t) => t.userId == user.id);
                   if (hasReservedTable) {
-                    navigateToStoreDetail(tables, user, store, context);
+                    _navigateToStoreDetail();
                   } else {
                     showDialog(
                       context: context,

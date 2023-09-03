@@ -1,18 +1,19 @@
-import 'dart:developer';
+// ignore_for_file: use_build_context_synchronously
 
-import 'package:e_serve/Controlers/stores_controllers.dart';
-import 'package:e_serve/Controlers/user_controllers.dart';
-import 'package:e_serve/Models/store_model.dart';
-import 'package:e_serve/Models/user_model.dart';
-import 'package:e_serve/View/store_details_screen.dart';
-import 'package:e_serve/View/tables_view.dart';
-import 'package:e_serve/View/user_profile_view.dart';
-import 'package:e_serve/View/users_orders_view.dart';
-import 'package:e_serve/View/widgets.dart';
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../Controlers/stores_controllers.dart';
+import '../Controlers/user_controllers.dart';
 import '../Models/routes.dart';
+import '../Models/store_model.dart';
+import '../Models/user_model.dart';
+import 'tables_view.dart';
+import 'user_profile_view.dart';
+import 'users_orders_view.dart';
+import 'widgets.dart';
 
 enum MenuAction {
   profile,
@@ -28,29 +29,6 @@ class StoresView extends StatefulWidget {
 }
 
 class _StoresViewState extends State<StoresView> {
-  // @override
-  // initState() {
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     var stores = _asyncMethod();
-  //   });
-
-  //   super.initState();
-  // }
-
-  // _asyncMethod() async {
-  //   //List<UserMap> users = await getAllUsers();
-  //   //log(users.toString());
-
-  //   List<UserMap> stores = await getAllStores();
-  //   log(stores.toString());
-  //   return stores;
-  // }
-
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  // }
-
   late String firebaseUserID;
   late UserMap currentUser;
 
@@ -59,8 +37,6 @@ class _StoresViewState extends State<StoresView> {
     super.initState();
     // Initialize firebaseUserID
     firebaseUserID = FirebaseAuth.instance.currentUser!.uid;
-
-    // Fetch user data using getUserByID
     getUserData();
   }
 
@@ -68,9 +44,6 @@ class _StoresViewState extends State<StoresView> {
     final x = await getUserByID(firebaseUserID);
     setState(() {
       currentUser = x!;
-      //log("edwwwwwwwwwwwwwwwww");
-      //log(currentUser!.id.toString());
-      //log(currentUser.toString());
     });
   }
 
@@ -79,6 +52,7 @@ class _StoresViewState extends State<StoresView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Stores '),
+        backgroundColor: const Color.fromARGB(255, 215, 35, 35),
         actions: [
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
@@ -92,14 +66,13 @@ class _StoresViewState extends State<StoresView> {
                       (_) => false,
                     );
                   }
-                  //log(shouldLogout.toString());
                   break;
                 case MenuAction.profile:
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UserProfilePage(
-                          currentUser!), // Pass the user details
+                      builder: (context) =>
+                          UserProfilePage(currentUser), // Pass the user details
                     ),
                   );
                   break;
@@ -108,7 +81,7 @@ class _StoresViewState extends State<StoresView> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          UsersOrders(currentUser!), // Pass the user details
+                          UsersOrders(currentUser), // Pass the user details
                     ),
                   );
                   break;
@@ -116,15 +89,15 @@ class _StoresViewState extends State<StoresView> {
             },
             itemBuilder: (context) {
               return [
-                PopupMenuItem<MenuAction>(
+                const PopupMenuItem<MenuAction>(
                   value: MenuAction.profile, // Define this value in your enum
                   child: Text('Profile'),
                 ),
-                PopupMenuItem<MenuAction>(
+                const PopupMenuItem<MenuAction>(
                   value: MenuAction.orders, // Define this value in your enum
                   child: Text('Orders'),
                 ),
-                PopupMenuItem<MenuAction>(
+                const PopupMenuItem<MenuAction>(
                   value: MenuAction.logout, // Define this value in your enum
                   child: Text('Logout'),
                 ),
@@ -159,7 +132,7 @@ class StoresListView extends StatelessWidget {
   final List<StoresMap> stores;
   final UserMap user;
 
-  StoresListView({required this.stores, required this.user});
+  const StoresListView({super.key, required this.stores, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -167,29 +140,31 @@ class StoresListView extends StatelessWidget {
       itemCount: stores.length,
       itemBuilder: (context, index) {
         final store = stores[index];
-        return ListTile(
-          title: Text(store.name ?? 'No Name'),
-          subtitle: Text(store.owner),
-          trailing: Text(store.id ?? 'No ID'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TablesViewScreen(
-                  store: store,
-                  user: user,
-                ), // Pass store details
-                // builder: (context) => StoreDetailScreen(
-                //   store,
-                //   user: user,
-                // ), // Pass store details
-              ),
-            );
-          },
+        final logoBytes =
+            base64Decode(store.imageData); // Decode Base64 to bytes
+        return Card(
+          elevation: 3,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: ListTile(
+            leading: Image.memory(logoBytes),
+            title: Text(store.name),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TablesViewScreen(
+                    store: store,
+                    user: user,
+                  ), // Pass store details
+                ),
+              );
+            },
+          ),
         );
       },
     );
   }
+}
 
 // with doc reference ownwer
 
@@ -222,35 +197,11 @@ class StoresListView extends StatelessWidget {
   //     },
   //   );
   // }
-}
-
-// Future<bool> showLogOutDialog(BuildContext context) {
-//   return showDialog<bool>(
-//       context: context,
-//       builder: (context) {
-//         return AlertDialog(
-//           title: const Text('Sign Out'),
-//           content: const Text('Are you sure you want to sign out ?'),
-//           actions: [
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(false);
-//               },
-//               child: const Text('Cancel'),
-//             ),
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(true);
-//               },
-//               child: const Text('Logout'),
-//             ),
-//           ],
-//         );
-//       }).then((value) => value ?? false);
-// }
 
 // Future<QuerySnapshot<Map<String, dynamic>>> _loadStoresAsList() async {
 //   var stores = await retrieveStoresAsMap();
 //   //log(stores.toString());
 //   return stores;
 // }
+
+

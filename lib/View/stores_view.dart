@@ -1,5 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:e_serve/Controlers/stores_controllers.dart';
 import 'package:e_serve/Controlers/user_controllers.dart';
@@ -36,8 +37,6 @@ class _StoresViewState extends State<StoresView> {
     super.initState();
     // Initialize firebaseUserID
     firebaseUserID = FirebaseAuth.instance.currentUser!.uid;
-
-    // Fetch user data using getUserByID
     getUserData();
   }
 
@@ -53,7 +52,7 @@ class _StoresViewState extends State<StoresView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Stores '),
-        backgroundColor: Color.fromARGB(255, 215, 35, 35),
+        backgroundColor: const Color.fromARGB(255, 215, 35, 35),
         actions: [
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
@@ -67,14 +66,13 @@ class _StoresViewState extends State<StoresView> {
                       (_) => false,
                     );
                   }
-                  //log(shouldLogout.toString());
                   break;
                 case MenuAction.profile:
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => UserProfilePage(
-                          currentUser!), // Pass the user details
+                      builder: (context) =>
+                          UserProfilePage(currentUser), // Pass the user details
                     ),
                   );
                   break;
@@ -83,7 +81,7 @@ class _StoresViewState extends State<StoresView> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          UsersOrders(currentUser!), // Pass the user details
+                          UsersOrders(currentUser), // Pass the user details
                     ),
                   );
                   break;
@@ -91,15 +89,15 @@ class _StoresViewState extends State<StoresView> {
             },
             itemBuilder: (context) {
               return [
-                PopupMenuItem<MenuAction>(
+                const PopupMenuItem<MenuAction>(
                   value: MenuAction.profile, // Define this value in your enum
                   child: Text('Profile'),
                 ),
-                PopupMenuItem<MenuAction>(
+                const PopupMenuItem<MenuAction>(
                   value: MenuAction.orders, // Define this value in your enum
                   child: Text('Orders'),
                 ),
-                PopupMenuItem<MenuAction>(
+                const PopupMenuItem<MenuAction>(
                   value: MenuAction.logout, // Define this value in your enum
                   child: Text('Logout'),
                 ),
@@ -134,7 +132,7 @@ class StoresListView extends StatelessWidget {
   final List<StoresMap> stores;
   final UserMap user;
 
-  StoresListView({required this.stores, required this.user});
+  const StoresListView({super.key, required this.stores, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -145,16 +143,11 @@ class StoresListView extends StatelessWidget {
         final logoBytes =
             base64Decode(store.imageData); // Decode Base64 to bytes
         return Card(
-          elevation: 3, // Add a slight elevation to the card
-          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          elevation: 3,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: ListTile(
             leading: Image.memory(logoBytes),
-            title: Text(store.name ?? 'No Name'),
-
-            //subtitle: Text(store.owner),
-            //trailing: Text(store.id ?? 'No ID'),
-            //trailing: Text('Order'),
-
+            title: Text(store.name),
             onTap: () {
               Navigator.push(
                 context,
@@ -172,69 +165,3 @@ class StoresListView extends StatelessWidget {
     );
   }
 }
-
-// with doc reference ownwer
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return ListView.builder(
-  //     itemCount: stores.length,
-  //     itemBuilder: (context, index) {
-  //       final store = stores[index];
-  //       return ListTile(
-  //         title: Text(store.name ?? 'No Name'),
-  //         subtitle: FutureBuilder<String>(
-  //           future: getStoreOwnerName(
-  //               store.owner), // Fetch owner's name from Firebase
-  //           builder: (context, snapshot) {
-  //             if (snapshot.connectionState == ConnectionState.waiting) {
-  //               return Text('Loading...');
-  //             } else if (snapshot.hasError) {
-  //               return Text('Error fetching owner name');
-  //             } else if (snapshot.hasData) {
-  //               String ownerName = snapshot.data!;
-  //               return Text(ownerName);
-  //             } else {
-  //               return Text('No Owner');
-  //             }
-  //           },
-  //         ),
-  //         trailing: Text(store.id ?? 'No ID'),
-  //       );
-  //     },
-  //   );
-  // }
-
-
-// Future<bool> showLogOutDialog(BuildContext context) {
-//   return showDialog<bool>(
-//       context: context,
-//       builder: (context) {
-//         return AlertDialog(
-//           title: const Text('Sign Out'),
-//           content: const Text('Are you sure you want to sign out ?'),
-//           actions: [
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(false);
-//               },
-//               child: const Text('Cancel'),
-//             ),
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(true);
-//               },
-//               child: const Text('Logout'),
-//             ),
-//           ],
-//         );
-//       }).then((value) => value ?? false);
-// }
-
-// Future<QuerySnapshot<Map<String, dynamic>>> _loadStoresAsList() async {
-//   var stores = await retrieveStoresAsMap();
-//   //log(stores.toString());
-//   return stores;
-// }
-
-
