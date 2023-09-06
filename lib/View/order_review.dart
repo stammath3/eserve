@@ -1,18 +1,16 @@
-// ... Your Basket class and other classes ...
-
 import 'package:flutter/material.dart';
 import '../Controlers/orders_controllers.dart';
 import '../Models/order_model.dart';
 import '../Models/store_model.dart';
 import '../Models/user_model.dart';
 
-class BasketPage extends StatelessWidget {
+class OrderPage extends StatelessWidget {
   final Basket basket;
   final StoresMap store;
   final UserMap user;
   final TableData table;
 
-  const BasketPage(
+  const OrderPage(
       {Key? key,
       required this.basket,
       required this.store,
@@ -22,10 +20,10 @@ class BasketPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<MenuItems> basketItems = basket.getItems();
+    List<MenuItems> orderItems = basket.getItems();
 
     double totalCost =
-        basketItems.fold(0.0, (sum, item) => sum + double.parse(item.cost));
+        orderItems.fold(0.0, (sum, item) => sum + double.parse(item.cost));
 
     return Scaffold(
       appBar: AppBar(
@@ -50,11 +48,11 @@ class BasketPage extends StatelessWidget {
                   ],
                 ),
                 child: ListView.builder(
-                  itemCount: basketItems.length,
+                  itemCount: orderItems.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(basketItems[index].name),
-                      subtitle: Text('Cost: ${basketItems[index].cost}  	€'),
+                      title: Text(orderItems[index].name),
+                      subtitle: Text('Cost: ${orderItems[index].cost}  	€'),
                     );
                   },
                 ),
@@ -72,8 +70,8 @@ class BasketPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                createNewOrder(user, store, table, totalCost, context,
-                    basketItems, basket);
+                createNewOrder(
+                    user, store, table, totalCost, context, orderItems, basket);
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.black),

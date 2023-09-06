@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_serve/Models/order_model.dart';
-import 'package:e_serve/View/store_details_screen.dart';
+import 'package:e_serve/View/store_order_screen.dart';
 import 'package:flutter/material.dart';
 import '../Models/store_model.dart';
 

@@ -1,7 +1,7 @@
 // ignore_for_file: no_logic_in_create_state, library_private_types_in_public_api
 
 import 'package:e_serve/Models/user_model.dart';
-import 'package:e_serve/View/order_review_basket.dart';
+import 'package:e_serve/View/order_review.dart';
 import 'package:flutter/material.dart';
 import '../Models/order_model.dart';
 import '../Models/store_model.dart';
@@ -202,7 +202,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BasketPage(
+                    builder: (context) => OrderPage(
                       table: reservedTable,
                       user: user,
                       basket: basket,
@@ -213,7 +213,7 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
               },
               label: Text(
                   'Order review (${basket.getItems().length}) ${basket.getTotalCost()} €'),
-              icon: const Icon(Icons.shopping_basket),
+              icon: const Icon(Icons.list),
               backgroundColor: const Color.fromARGB(255, 215, 35, 35),
             ),
           ],
