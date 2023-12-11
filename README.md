@@ -1,16 +1,15 @@
 # e_serve
 
-Thesis project.
+This is a thesis project made for our university.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project was made to address the technological need in foodservice and business. It is divided into two applications one for shopkeepers (desktop app) and one for customers (mobile app).
 
-A few resources to get you started if this is your first Flutter project:
+This is the source code of the mobile app project.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- The aim of the project is to familiarize students with technologies that build desktop and mobile applications as well as their theoretical and practical understanding.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- The development of applications was done using: Flutter & Dart (mobile app), Java & JavaFX (desktop app) and Firebase & Firestore (shared database).
+
+
