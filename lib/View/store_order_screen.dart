@@ -1,5 +1,6 @@
 // ignore_for_file: no_logic_in_create_state, library_private_types_in_public_api
 
+import 'package:e_serve/Controlers/stores_controllers.dart';
 import 'package:e_serve/Models/user_model.dart';
 import 'package:e_serve/View/order_review.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +11,13 @@ class StoreDetailScreen extends StatefulWidget {
   final StoresMap store;
   final UserMap user;
   final TableData reservedTable;
-  const StoreDetailScreen(
-      {Key? key,
-      required this.store,
-      required this.user,
-      required this.reservedTable})
-      : super(key: key);
+
+  const StoreDetailScreen({
+    Key? key,
+    required this.store,
+    required this.user,
+    required this.reservedTable,
+  }) : super(key: key);
 
   @override
   _StoreDetailScreenState createState() =>
@@ -28,7 +30,16 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
   final StoresMap store;
   final UserMap user;
   final TableData reservedTable;
+
   _StoreDetailScreenState(this.store, this.user, this.reservedTable);
+
+  Future<void> _refreshPage() async {
+    // Fetch updated menu data or any other data refresh logic here
+    final updatedMenu = await getStoreMenuDetails(store.id);
+    setState(() {
+      store.menu = updatedMenu;
+    });
+  }
 
   @override
   void initState() {
@@ -72,122 +83,128 @@ class _StoreDetailScreenState extends State<StoreDetailScreen> {
                 ),
               ),
               const Divider(
-                color: Colors.black, // Color of the line
-                thickness: 1.0, // Thickness of the line
-                indent: 16.0, // Indent from the left
-                endIndent: 16.0, // Indent from the right
+                color: Colors.black,
+                thickness: 1.0,
+                indent: 16.0,
+                endIndent: 16.0,
               ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: widget.store.menu.length,
-                  itemBuilder: (context, categoryIndex) {
-                    final category = widget.store.menu[categoryIndex];
-                    final categoryName = category['categoryName'];
-                    final menuItems = category['menuItems'];
+                child: RefreshIndicator(
+                  onRefresh: _refreshPage,
+                  child: ListView.builder(
+                    itemCount: widget.store.menu.length,
+                    itemBuilder: (context, categoryIndex) {
+                      final category = widget.store.menu[categoryIndex];
+                      final categoryName = category['categoryName'];
+                      final menuItems = category['menuItems'];
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Text(
-                            categoryName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: Text(
+                              categoryName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
-                        ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: menuItems.length,
-                          itemBuilder: (context, index) {
-                            final menuItem = menuItems[index];
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: menuItems.length,
+                            itemBuilder: (context, index) {
+                              final menuItem = menuItems[index];
 
-                            return Container(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 4,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
-                              ),
-                              child: ListTile(
-                                title: Text(menuItem['name']),
-                                subtitle: Text('Cost: ${menuItem['cost']} 	€'),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        setState(() {
-                                          final menuItems = widget.store
-                                              .menu[categoryIndex]['menuItems'];
-                                          final menuItem = menuItems[index];
-                                          final menuItemsObject = MenuItems(
-                                            cost: menuItem['cost'],
-                                            name: menuItem['name'],
-                                            id: menuItem['id'],
-                                          );
-                                          basket.addItem(menuItemsObject);
-                                        });
-                                      },
-                                      icon: const Icon(Icons.add),
-                                      label: const Text(''),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
-                                        padding: const EdgeInsets.fromLTRB(
-                                            10, 0, 0, 0),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        setState(() {
-                                          final menuItems = widget.store
-                                              .menu[categoryIndex]['menuItems'];
-                                          final menuItem = menuItems[index];
-                                          final menuItemsObject = MenuItems(
-                                            cost: menuItem['cost'],
-                                            name: menuItem['name'],
-                                            id: menuItem['id'],
-                                          );
-                                          basket.removeItem(menuItemsObject);
-                                        });
-                                      },
-                                      icon: const Icon(Icons.remove),
-                                      label: const Text(''),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        padding: const EdgeInsets.fromLTRB(
-                                            10, 0, 0, 0),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                      ),
+                              return Container(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      blurRadius: 4,
+                                      spreadRadius: 2,
                                     ),
                                   ],
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
+                                child: ListTile(
+                                  title: Text(menuItem['name']),
+                                  subtitle:
+                                      Text('Cost: ${menuItem['cost']}  €'),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            final menuItems =
+                                                widget.store.menu[categoryIndex]
+                                                    ['menuItems'];
+                                            final menuItem = menuItems[index];
+                                            final menuItemsObject = MenuItems(
+                                              cost: menuItem['cost'],
+                                              name: menuItem['name'],
+                                              id: menuItem['id'],
+                                            );
+                                            basket.addItem(menuItemsObject);
+                                          });
+                                        },
+                                        icon: const Icon(Icons.add),
+                                        label: const Text(''),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 0, 0),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            final menuItems =
+                                                widget.store.menu[categoryIndex]
+                                                    ['menuItems'];
+                                            final menuItem = menuItems[index];
+                                            final menuItemsObject = MenuItems(
+                                              cost: menuItem['cost'],
+                                              name: menuItem['name'],
+                                              id: menuItem['id'],
+                                            );
+                                            basket.removeItem(menuItemsObject);
+                                          });
+                                        },
+                                        icon: const Icon(Icons.remove),
+                                        label: const Text(''),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 0, 0),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ],

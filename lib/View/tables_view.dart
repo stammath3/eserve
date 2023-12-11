@@ -1,7 +1,6 @@
-// ignore_for_file: library_private_types_in_public_api, no_logic_in_create_state
-
 import 'package:e_serve/Controlers/stores_controllers.dart';
 import 'package:e_serve/Models/user_model.dart';
+import 'package:e_serve/View/home_page_view.dart';
 import 'package:flutter/material.dart';
 
 import '../Models/order_model.dart';
@@ -18,7 +17,7 @@ class TablesViewScreen extends StatefulWidget {
 }
 
 class _TableViewScreenState extends State<TablesViewScreen> {
-  List<TableData> tables = []; // New list to store tables
+  List<TableData> tables = [];
   final StoresMap store;
   final UserMap user;
   _TableViewScreenState(this.store, this.user);
@@ -37,6 +36,14 @@ class _TableViewScreenState extends State<TablesViewScreen> {
     }).toList();
   }
 
+  Future<void> _refreshPage() async {
+    // Fetch updated table data or any other data refresh logic here
+    final updatedTables = await getStoreTableDetails(store.id);
+    setState(() {
+      tables = updatedTables;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,11 +52,15 @@ class _TableViewScreenState extends State<TablesViewScreen> {
           title: Text(widget.store.name),
           backgroundColor: const Color.fromARGB(255, 215, 35, 35),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
+                );
+              }),
         ),
         body: Center(
           child: Column(
@@ -59,103 +70,103 @@ class _TableViewScreenState extends State<TablesViewScreen> {
               const Text(
                 'Tables',
                 style: TextStyle(
-                  fontWeight: FontWeight.bold, // Make the text bold
+                  fontWeight: FontWeight.bold,
                   fontSize: 18,
                   color: Colors.black,
                 ),
-              ), // Header for tables
+              ),
               Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _refreshPage, // Pass a function reference
                   child: ListView.builder(
-                itemCount: tables.length,
-                itemBuilder: (context, index) {
-                  final table = tables[index];
-                  final isReserved = table.isReserved;
+                    itemCount: tables.length,
+                    itemBuilder: (context, index) {
+                      final table = tables[index];
+                      final isReserved = table.isReserved;
 
-                  final buttonColor = isReserved ? Colors.grey : Colors.green;
-                  final lineColour = isReserved ? Colors.grey : Colors.green;
+                      final buttonColor =
+                          isReserved ? Colors.grey : Colors.green;
+                      final lineColour =
+                          isReserved ? Colors.grey : Colors.green;
 
-                  return Container(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: lineColour,
-                          blurRadius: 4,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.table_restaurant, // Use the table icon
-                        size: 48,
-                        color: lineColour, // Customize the icon color
-                      ),
-                      title: Text(table.name),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(width: 10),
-                          ElevatedButton(
-                            onPressed: isReserved || table.userId.isNotEmpty
-                                ? null // Disable the button if the table is reserved
-                                : () async {
-                                    //reserveTable(user, tables, isReserved, table, widget, context)
-                                    final userID = user.id;
-
-                                    final hasReservedTable = tables.any((t) =>
-                                        t.userId.toString() == userID &&
-                                        t.tableId != table.tableId);
-                                    if (!isReserved &&
-                                        table.userId.isEmpty &&
-                                        !hasReservedTable) {
-                                      // Check if the user has already reserved a table
-
-                                      if (!isReserved) {
-                                        reserveTable(widget, table, isReserved,
-                                            store, user);
-
-                                        setState(() {
-                                          table.isReserved = true;
-                                          table.userId = userID;
-                                        });
-                                      } else {
-                                        // Notify the user that they have already reserved a table
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'You have already reserved a table')),
-                                        );
-                                      }
-                                    } else {
-                                      // Notify the user that they have already reserved a table
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                'You have already reserved a table')),
-                                      );
-                                    }
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: buttonColor, // Text color
-                              // Disable the button's click animation
-                              animationDuration: Duration.zero,
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: lineColour,
+                              blurRadius: 4,
+                              spreadRadius: 2,
                             ),
-                            child: const Text('Reserve'),
+                          ],
+                        ),
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.table_restaurant,
+                            size: 48,
+                            color: lineColour,
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              )),
+                          title: Text(table.name),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(width: 10),
+                              ElevatedButton(
+                                onPressed: isReserved || table.userId.isNotEmpty
+                                    ? null
+                                    : () async {
+                                        final userID = user.id;
 
+                                        final hasReservedTable = tables.any(
+                                            (t) =>
+                                                t.userId.toString() == userID &&
+                                                t.tableId != table.tableId);
+                                        if (!isReserved &&
+                                            table.userId.isEmpty &&
+                                            !hasReservedTable) {
+                                          if (!isReserved) {
+                                            reserveTable(widget, table,
+                                                isReserved, store, user);
+
+                                            setState(() {
+                                              table.isReserved = true;
+                                              table.userId = userID;
+                                            });
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'You have already reserved a table')),
+                                            );
+                                          }
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    'You have already reserved a table')),
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: buttonColor,
+                                  animationDuration: Duration.zero,
+                                ),
+                                child: const Text('Reserve'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ButtonStyle(
@@ -179,7 +190,7 @@ class _TableViewScreenState extends State<TablesViewScreen> {
                           actions: [
                             ElevatedButton(
                               onPressed: () {
-                                Navigator.of(context).pop(); // Close the dialog
+                                Navigator.of(context).pop();
                               },
                               style: ButtonStyle(
                                   backgroundColor:

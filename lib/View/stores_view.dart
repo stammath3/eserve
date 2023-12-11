@@ -1,8 +1,5 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_serve/Controlers/stores_controllers.dart';
 import 'package:e_serve/Controlers/user_controllers.dart';
 import 'package:e_serve/View/tables_view.dart';
@@ -23,7 +20,7 @@ enum MenuAction {
 }
 
 class StoresView extends StatefulWidget {
-  const StoresView({super.key});
+  const StoresView({Key? key});
 
   @override
   State<StoresView> createState() => _StoresViewState();
@@ -34,21 +31,29 @@ class _StoresViewState extends State<StoresView> {
   final TextEditingController _searchController = TextEditingController();
   late UserMap currentUser;
   late List<StoresMap> _allStores;
-  late List<StoresMap> _filteredStores; // Add this line
+  late List<StoresMap> _filteredStores;
 
   @override
   void initState() {
     super.initState();
     firebaseUserID = FirebaseAuth.instance.currentUser!.uid;
     getUserData();
-    _allStores = []; // Initialize _allStores as an empty list
-    _filteredStores = []; // Initialize _filteredStores as an empty list
+    _allStores = [];
+    _filteredStores = [];
   }
 
   Future<void> getUserData() async {
     final x = await getUserByID(firebaseUserID);
     setState(() {
       currentUser = x!;
+    });
+  }
+
+  Future<void> _refreshPage() async {
+    // Fetch updated store data or any other data refresh logic here
+    final updatedStores = await getAllStores();
+    setState(() {
+      _allStores = updatedStores;
     });
   }
 
@@ -118,7 +123,7 @@ class _StoresViewState extends State<StoresView> {
               decoration: InputDecoration(
                 hintText: 'Search stores by name',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                   onPressed: () {
                     _searchController.clear();
                     _searchStores(""); // Clear the search and show all stores
@@ -141,41 +146,41 @@ class _StoresViewState extends State<StoresView> {
                 });
               },
               onSubmitted: (query) {
-                // Handle search when the user presses enter
-                // You will implement the search functionality here
                 _searchStores(query); // Perform the search
               },
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<StoresMap>>(
-              future: getAllStores(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(child: Text('Error fetching stores'));
-                } else if (snapshot.hasData) {
-                  _allStores = snapshot.data!; // Update _allStores
-                  // final storesToDisplay =
-                  //     _filteredStores.isNotEmpty ? _filteredStores : _allStores;
-                  final storesToDisplay = _searchController.text.isEmpty
-                      ? _allStores
-                      : _filteredStores;
+            child: RefreshIndicator(
+              onRefresh: _refreshPage, // Call _refreshPage on pull-to-refresh
+              child: FutureBuilder<List<StoresMap>>(
+                future: getAllStores(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text('Error fetching stores'));
+                  } else if (snapshot.hasData) {
+                    _allStores = snapshot.data!; // Update _allStores
 
-                  if (storesToDisplay.isEmpty) {
-                    // If there are no stores to display, show a message
-                    return const Center(child: Text('No stores found'));
+                    final storesToDisplay = _searchController.text.isEmpty
+                        ? _allStores
+                        : _filteredStores;
+
+                    if (storesToDisplay.isEmpty) {
+                      // If there are no stores to display, show a message
+                      return const Center(child: Text('No stores found'));
+                    } else {
+                      return StoresListView(
+                        stores: storesToDisplay,
+                        user: currentUser,
+                      );
+                    }
                   } else {
-                    return StoresListView(
-                      stores: storesToDisplay,
-                      user: currentUser,
-                    );
+                    return const Center(child: Text('No stores found'));
                   }
-                } else {
-                  return const Center(child: Text('No stores found'));
-                }
-              },
+                },
+              ),
             ),
           ),
         ],
@@ -187,7 +192,6 @@ class _StoresViewState extends State<StoresView> {
     if (query.isEmpty || query == "") {
       setState(() {
         _filteredStores.clear(); // Clear the filtered stores list
-        //_filteredStores = _allStores;
       });
     } else {
       final filteredStores = _allStores
@@ -213,7 +217,8 @@ class StoresListView extends StatelessWidget {
   final List<StoresMap> stores;
   final UserMap user;
 
-  const StoresListView({super.key, required this.stores, required this.user});
+  const StoresListView({Key? key, required this.stores, required this.user})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

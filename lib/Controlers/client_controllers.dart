@@ -2,8 +2,6 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Models/client_model.dart';
 
-//final FirebaseFirestore _db = FirebaseFirestore.instance;
-
 Future<List<ClientsMap>> getAllClients() async {
   final CollectionReference clientsCollection =
       FirebaseFirestore.instance.collection('clients');

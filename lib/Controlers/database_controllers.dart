@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 
 import '../Models/routes.dart';
 
-//final FirebaseFirestore _db = FirebaseFirestore.instance;
-
 Future<dynamic> loginToDB(email, password, context) async {
   try {
     await FirebaseAuth.instance.signInWithEmailAndPassword(

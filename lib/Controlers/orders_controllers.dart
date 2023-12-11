@@ -26,8 +26,6 @@ Future<List<OrdersMap>> getAllOrders() async {
 Future<void> createOrder(OrdersMap order) async {
   final ordersCollection = FirebaseFirestore.instance.collection('orders');
   await ordersCollection.add(order.toMap());
-
-  log('orderrrrrrrrrrrrrrrrrr');
   log(order.toString());
 }
 
@@ -45,7 +43,6 @@ Future<int> getNextAvailableOrderID() async {
 
   int highestOrderID = querySnapshot.docs.first['order_id'];
   int nextOrderID = highestOrderID + 1;
-
   return nextOrderID;
 }
 
@@ -238,7 +235,6 @@ void pay(order, tableName, store, context) async {
       }
     ])
   });
-
   // Update the order's concluded status to true
   await updateOrderConcludedStatus(order!.order_id, true);
   Navigator.of(context).pushNamedAndRemoveUntil(

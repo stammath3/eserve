@@ -79,11 +79,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 registerRoute,
                 (route) => false,
               );
-
-              // Navigator.of(context).pushNamedAndRemoveUntil(
-              //   homePageRoute,
-              //   (_) => false,
-              // );
             }),
             child: const Text(
               'Restart',

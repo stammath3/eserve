@@ -35,10 +35,6 @@ Future<List<StoresMap>> retrieveStores() async {
 Future<QuerySnapshot<Map<String, dynamic>>> retrieveStoresAsMap() async {
   QuerySnapshot<Map<String, dynamic>> snapshot =
       await _db.collection("stores").get();
-  // var x = snapshot.docs
-  //     .map((docSnapshot) => StoresMap.fromDocumentSnapshot(docSnapshot))
-  //     .toList()
-  //     .toString();
   return snapshot;
 }
 
@@ -80,6 +76,46 @@ Future<StoresMap?> getStoreDetails(String storeId) async {
     return StoresMap.fromDocumentSnapshot(snapshot);
   } else {
     return null;
+  }
+}
+
+Future<List<TableData>> getStoreTableDetails(String storeId) async {
+  DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance.collection('stores').doc(storeId).get();
+
+  if (snapshot.exists) {
+    final StoresMap storeMap = StoresMap.fromDocumentSnapshot(snapshot);
+
+    // Extract and return the tables data
+    final List<TableData> tables = storeMap.tables.map((tableData) {
+      return TableData(
+        tableId: tableData['table_id'],
+        orderId: tableData['order_id'],
+        isReserved: tableData['is_reserved'] as bool,
+        name: tableData['name'] as String,
+        userId: tableData['user_id'] as String,
+      );
+    }).toList();
+
+    return tables;
+  } else {
+    // Handle the case when the store does not exist or other error handling
+    return []; // Return an empty list or handle it differently as needed
+  }
+}
+
+Future<List<dynamic>> getStoreMenuDetails(String storeId) async {
+  DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance.collection('stores').doc(storeId).get();
+
+  if (snapshot.exists) {
+    final StoresMap storeMap = StoresMap.fromDocumentSnapshot(snapshot);
+
+    // Return the entire menu data
+    return storeMap.menu;
+  } else {
+    // Handle the case when the store does not exist or other error handling
+    return []; // Return an empty list or handle it differently as needed
   }
 }
 
