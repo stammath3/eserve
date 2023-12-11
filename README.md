@@ -1,6 +1,6 @@
 # e_serve
 
-A new Flutter project.
+Thesis project.
 
 ## Getting Started
 
