@@ -14,13 +14,21 @@ This is the source code of the mobile app project.
 
 
 - Login/Register
-![Alt text](login.png) ![Alt text](register.png) ![Alt text](verify_email.png)
+
+![Alt text](login.png) ![Alt text](register.png) 
+
+![Alt text](verify_email.png)
 
 - Order Procedure
-![Alt text](<stores detail.png>) ![Alt text](<order screen.png>) ![Alt text](<order review.png>) ![Alt text](<payment page.png>)
+
+![Alt text](<stores detail.png>) ![Alt text](<order screen.png>) 
+
+![Alt text](<order review.png>) ![Alt text](<payment page.png>)
 
 - Profile pages
+
 ![Alt text](profile.png)  ![Alt text](<order history.png>)
 
 - Home Page
+
 ![Alt text](stores_screen.png)
