@@ -16,20 +16,28 @@ This is the source code of the mobile app project.
 
 - Login/Register
 
-![Alt text](login.png) ![Alt text](register.png) 
+<p align="center">
+![Alt text](login-1.png) ![Alt text](register-1.png)
 
-![Alt text](verify_email.png)
+![Alt text](verify_email-1.png)
+</p>
 
 - Order Procedure
 
-![Alt text](<stores detail.png>) ![Alt text](<order screen.png>) 
+<p align="center">
+![Alt text](<stores detail-1.png>) ![Alt text](<order screen-1.png>)
 
-![Alt text](<order review.png>) ![Alt text](<payment page.png>)
+![Alt text](<order review-1.png>) ![Alt text](<payment page-1.png>)
+</p>
 
 - Profile pages
 
-![Alt text](profile.png)  ![Alt text](<order history.png>)
+<p align="center">
+![Alt text](profile-1.png)  ![Alt text](<order history-1.png>)
+</p>
 
 - Home Page
 
-![Alt text](stores_screen.png)
+<p align="center">
+![Alt text](stores_screen-1.png)
+</p>
